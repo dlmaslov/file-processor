@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date %logger - [%level] %message%n%xException</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.dlmaslov.fprocessing.actors.GoogleTranslator" level="DEBUG"/>
+    <logger name="com.dlmaslov.fprocessing.actors.ResponseHandler" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
