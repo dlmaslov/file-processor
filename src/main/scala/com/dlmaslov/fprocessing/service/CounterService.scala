@@ -1,7 +1,6 @@
 package com.dlmaslov.fprocessing.service
 
 import com.typesafe.config.Config
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -26,31 +25,30 @@ class CounterService(config: Config, fileService: CsvFileService = new CsvFileSe
   def countTopWords(filePath: String)(implicit ec: ExecutionContext): Future[Seq[Counter]] = {
     Future(
       fileService.file(filePath).lines
-      .map(fileService.parseLine(_)(textColumn))
-      .flatMap(fileService.parseWords)
-      .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
-      .toSeq.sortBy(-_._2).take(maxResultElements)
-      .sortBy(_._1)
+        .flatMap(row => fileService.parseWords(row(textColumn)))
+        .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
+        .toSeq.sortBy(-_._2).take(maxResultElements)
+        .sortBy(_._1)
     )
   }
 
   def countTopActiveProfiles(filePath: String)(implicit ec: ExecutionContext): Future[Seq[Counter]] = {
     Future(
       fileService.file(filePath).lines
-      .map(fileService.parseLine(_)(profileColumn))
-      .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
-      .toSeq.sortBy(-_._2).take(maxResultElements)
-      .sortBy(_._1)
+        .map(row => row(profileColumn))
+        .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
+        .toSeq.sortBy(-_._2).take(maxResultElements)
+        .sortBy(_._1)
     )
   }
 
   def countTopItems(filePath: String)(implicit ec: ExecutionContext): Future[Seq[Counter]] = {
     Future(
       fileService.file(filePath).lines
-      .map(fileService.parseLine(_)(itemColumn))
-      .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
-      .toSeq.sortBy(-_._2).take(maxResultElements)
-      .sortBy(_._1)
+        .map(row => row(itemColumn))
+        .foldLeft(Map.empty[String, Int])((r, s) => r + (s -> (r.getOrElse(s, 0) + 1)))
+        .toSeq.sortBy(-_._2).take(maxResultElements)
+        .sortBy(_._1)
     )
   }
 

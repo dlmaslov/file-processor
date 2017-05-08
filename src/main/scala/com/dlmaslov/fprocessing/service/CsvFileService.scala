@@ -1,5 +1,6 @@
 package com.dlmaslov.fprocessing.service
 
+import com.dlmaslov.fprocessing.service.CsvFormat.Row
 import scala.collection.mutable.ArrayBuffer
 
 
@@ -39,9 +40,9 @@ trait CsvFormat {
     var index = 0
     val len = line.length
     val columns = ArrayBuffer[String]()
+    val column = new StringBuilder()
 
     while (index < len){
-      val ab = ArrayBuffer[Char]()
       var columnStart = true
       var columnEnd = false
       var quoted = false
@@ -56,13 +57,14 @@ trait CsvFormat {
           if (columnStart) {
             quoted = true
           }
-          if (prevCharacter == quote && quotes % 2 == 1) ab += ch
-        } else ab += ch
+          if (prevCharacter == quote && quotes % 2 == 1) column += ch
+        } else column += ch
 
         prevCharacter = ch
         if (columnStart) columnStart = false
       }
-      columns += ab.mkString("")
+      columns += column.toString()
+      column.clear()
     }
     columns
   }
@@ -89,9 +91,9 @@ trait TextProcessor {
     var index = 0
     val len = text.length
     val out = ArrayBuffer[String]()
+    val phrase = new StringBuilder()
 
     while (index < len) {
-      val phrase = ArrayBuffer[Char]()
       var phraseEnd = false
       while (index < len && !phraseEnd) {
         val ch = text(index); index += 1
@@ -105,7 +107,8 @@ trait TextProcessor {
           phrase += '.'
         }
       }
-      out += phrase.mkString("")
+      out += phrase.toString()
+      phrase.clear()
     }
     out
   }
@@ -128,11 +131,14 @@ trait TextProcessor {
   }
 }
 
-case class CsvIteratedFile(header: CsvFormat.Header, lines: Iterator[String])
+case class CsvIteratedFile(header: CsvFormat.Header, lines: Iterator[Row])
 
+trait FileService {
+  def file(path: String, withHeader: Boolean = true): CsvIteratedFile
+}
 
 class CsvFileService(override val delimiter: Char = ',', override val quote: Char = '"')
-  extends CsvFormat with TextProcessor {
+  extends CsvFormat with TextProcessor with FileService {
   import CsvFormat._
 
   def file(path: String, withHeader: Boolean = true): CsvIteratedFile = {
@@ -143,6 +149,6 @@ class CsvFileService(override val delimiter: Char = ',', override val quote: Cha
         if (it.isEmpty) throw emptyFileException
         parseHeader(it.next())
     }
-    CsvIteratedFile(header, it)
+    CsvIteratedFile(header, it.map(this.parseLine))
   }
 }

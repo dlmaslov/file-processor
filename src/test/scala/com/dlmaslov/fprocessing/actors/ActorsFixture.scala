@@ -47,7 +47,7 @@ class FixtureTranslator(fileService: CsvFileService, probe: ActorRef, srcLines: 
   override def flowContext(path: String, in: Language, out: Language) = flowCxt
 
   override def lines(path: String) = {
-    srcLines.toIterator
+    srcLines.toIterator.map(fileService.parseLine)
   }
 
 }

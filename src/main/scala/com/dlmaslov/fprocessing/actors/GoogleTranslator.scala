@@ -140,8 +140,7 @@ abstract class Translator(fileService: CsvFileService) extends FailurePropagatin
       val flow = flowContext(path, inLang, outLang)
 
       lines(path)
-        .map(fileService.parseLine(_)(textColumn))
-        .flatMap(fileService.parsePhrases)
+        .flatMap(row => fileService.parsePhrases(row(textColumn)))
         .foreach { phrase =>
           processPhrase(phrase, flow)
         }
@@ -152,7 +151,7 @@ abstract class Translator(fileService: CsvFileService) extends FailurePropagatin
 
   def flowContext(path: String, in: Language, out: Language): FlowContext = FlowContext(path, in, out, new AtomicLong(0), new StringBuilder(batchSize))
 
-  def lines(path: String): Iterator[String] = fileService.file(path).lines
+  def lines(path: String): Iterator[Seq[String]] = fileService.file(path).lines
 
   /**
     * Packs phrases in batches; sends completed batches

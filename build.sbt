@@ -7,7 +7,7 @@ lazy val projectSettings = Seq(
 )
 
 val akkaVersion = "2.4.16"
-val akkaHttpVersion = "10.0.3"
+val akkaHttpVersion = "10.0.6"
 
 lazy val root = Project(id = "file-processor", base = file("."))
   .settings(projectSettings: _*)
@@ -19,7 +19,9 @@ lazy val root = Project(id = "file-processor", base = file("."))
       "ch.qos.logback" % "logback-classic" % "1.1.7",
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.4",
+      "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-jackson" % akkaHttpVersion,
+      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-csv" % "2.8.8",
       "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
       "org.scalatest" %% "scalatest" % "3.0.1" % Test
     )
